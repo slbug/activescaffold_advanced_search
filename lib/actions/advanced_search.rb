@@ -48,6 +48,8 @@ module ActiveScaffold::Actions
         self.active_scaffold_includes.concat includes_for_search_columns
       
         active_scaffold_config.list.user.page = nil
+        @filtered = true
+        active_scaffold_config.list.show_search_reset = false
       end
     end
 
