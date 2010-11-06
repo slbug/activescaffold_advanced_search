@@ -1,0 +1,40 @@
+<% href = url_for(params_for(:action => :index, :escape => false).delete_if{|k,v| k == 'advanced_search'}) -%>
+<% form_remote_tag :url => href,
+                    :method => :get,
+                    :before => "addActiveScaffoldPageToHistory('#{href}', '#{params[:controller]}')",
+                    :after => "$('#{loading_indicator_id(:action => :advanced_search, :id => params[:id])}').style.visibility = 'visible'; Form.disable('#{advanced_search_form_id}');",
+                    :complete => "$('#{loading_indicator_id(:action => :advanced_search, :id => params[:id])}').style.visibility = 'hidden'; Form.enable('#{advanced_search_form_id}');",
+                    :failure => "ActiveScaffold.report_500_response('#{active_scaffold_id}')",
+                    :html => { :href => href, :id => advanced_search_form_id, :class => 'advanced_search' } do %>
+  <br/>
+  <div class="as_label">Normal search: </div>
+  <div class="as_inputs"><input type="text" name="advanced_search" size="50" value="<%= params[:advanced_search] -%>" class="text-input" id="<%= advanced_search_input_id %>" autocompleted="off" /></div>
+  <div class="as_label">Advanced search:</div>
+  <div class="as_inputs">
+    <%= link_to_function "Add search criterion", "asAddCriterion(this, #{type_map}); " %>
+  </div>
+  <%= submit_tag as_('Search'), :class => "submit" %>
+  <a href="javascript:void(0)" class="cancel" onclick="f = this.up('form') ; var e ; while (f.down('.as_criterion')) { f.down('.as_criterion').remove(); }; f.reset(); f.onsubmit();"><%= as_('Reset') -%></a>
+  <%= loading_indicator_tag(:action => :advanced_search) %>
+<% end %>
+<div style="display: none; " id="as_template" class="as_criterion">
+	
+	<div style="display: none;" >
+	  <%= select_tag "as_group_boolean[]", '<option value="AND">AND</option><option value="OR">OR</option>'%>
+	</div>
+	
+  <%= select_tag "as_field[]", options, :class => "as_field" %><%= select_tag "as_negator[]", '<option value="does">DOES</option><option value="not">DOES NOT</option>' , :class => 'as_negator'%>
+  <%= select_tag "as_matcher[]", '<option value="equals">EQUAL</option><option value="contains">CONTAIN</option><option value="starts">START WITH</option><option value="ends">END WITH</option><option value="matches">MATCH</option>', :class => "as_matcher" %>
+  <%= text_field_tag "as_search[]", nil, :class => "text-input as_search" %>
+  <%= select_tag "as_b_matcher[]", '<option value="true">IS TRUE</option><option value="false">IS FALSE</option>', :class => "as_b_matcher" %>
+  <%= select_tag "as_i_matcher[]", '<option value="equals">=</option><option value="lt">&lt;</option><option value="gt">&gt;</option><option value="le">&le;</option><option value="ge">&ge;</option>', :class => "as_i_matcher" %>
+  <%= text_field_tag "as_i_search[]", nil, :class => "text-input as_i_search" %>
+  <%= link_to_function "remove", "asRemoveCriterion(this); " %>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+  new TextFieldWithExample('<%= advanced_search_input_id %>', '<%= as_("Search Terms") %>', {focus: false});
+  Form.focusFirstElement('<%= advanced_search_form_id -%>');
+//]]>
+</script>
